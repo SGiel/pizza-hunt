@@ -4,7 +4,16 @@ const pizzaController = {
   // get all pizzas
   // will serve as the callback function for the GET /api/pizzas route
   getAllPizza(req, res) {
+    // Telling Mongoose that we don't care about the __v field on pizza or comments. The minus sign - in front of the 
+    // field for comments indicates that we don't want it to be returned. If we didn't have it, it would mean that
+    // it would return only the __v field. For pizza it just adds unnecesary noise
     Pizza.find({})
+      .populate({
+        path: 'comments',
+        select: '-__v'
+      })
+      .select('-__v')
+      .sort({ _id: -1 })
       .then(dbPizzaData => res.json(dbPizzaData))
       .catch(err => {
         console.log(err);
@@ -15,8 +24,12 @@ const pizzaController = {
   // get one pizza by id -- instead of accessing entire req, destructured params out of it
   getPizzaById({ params }, res) {
     Pizza.findOne({ _id: params.id })
+      .populate({
+        path: 'comments',
+        select: '-__v'
+      })
+      .select('-__v')
       .then(dbPizzaData => {
-        // If no pizza is found, send 404
         if (!dbPizzaData) {
           res.status(404).json({ message: 'No pizza found with this id!' });
           return;
