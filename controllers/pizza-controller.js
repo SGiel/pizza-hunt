@@ -52,8 +52,11 @@ const pizzaController = {
   },
 
   // update pizza by id
+  // if we don't set that third parameter, { new: true }, it will return the original document. 
   updatePizza({ params, body }, res) {
-    Pizza.findOneAndUpdate({ _id: params.id }, body, { new: true })
+    // By setting the parameter new to true, we're instructing Mongoose to return the new version of the document.
+    // update pizza by id
+    Pizza.findOneAndUpdate({ _id: params.id }, body, { new: true, runValidators: true })
       .then(dbPizzaData => {
         if (!dbPizzaData) {
           res.status(404).json({ message: 'No pizza found with this id!' });
@@ -63,22 +66,6 @@ const pizzaController = {
       })
       .catch(err => res.status(400).json(err));
   },
-
-  // update pizza by id
-  updatePizza({ params, body }, res) {
-    // if we don't set that third parameter, { new: true }, it will return the original document. 
-    // By setting the parameter to true, we're instructing Mongoose to return the new version of the document.
-    Pizza.findOneAndUpdate({ _id: params.id }, body, { new: true })
-      .then(dbPizzaData => {
-        if (!dbPizzaData) {
-          res.status(404).json({ message: 'No pizza found with this id!' });
-          return;
-        }
-        res.json(dbPizzaData);
-      })
-      .catch(err => res.status(400).json(err));
-  },
-
   // delete pizza
   deletePizza({ params }, res) {
     Pizza.findOneAndDelete({ _id: params.id })
